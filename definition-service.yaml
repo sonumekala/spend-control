@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: definition-service
+  namespace: vendor-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: definition
+  template:
+    metadata:
+      labels:
+        app: definition
+    spec:
+      initContainers:
+        - name: definition-db-migrator
+          image: <ecr-url>/definition-db-migrator:latest
+          envFrom:
+            - configMapRef:
+                name: vendor-config
+      containers:
+        - name: definition
+          image: <ecr-url>/definition:latest
+          ports:
+            - containerPort: 6565
+          envFrom:
+            - configMapRef:
+                name: vendor-config
